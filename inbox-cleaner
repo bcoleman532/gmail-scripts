@@ -46,7 +46,7 @@ function archiveOldEmailsRange(start, max) {
     return -1;
   }
   var threadsDeleted = 0;
-  sleepTime = 200;
+  sleepTime = 1000;
   today = new Date();
   for (var i = 0; i < threads.length; i++) {
     curThread = threads[i];
