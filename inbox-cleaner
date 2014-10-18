@@ -65,7 +65,7 @@ function archiveOldEmailsRange(start, max) {
         }
       }
       else {
-        if(curThread.isUnread().valueOf() && months > 0.5) {
+        if(curThread.isUnread().valueOf() && months > 1) {
           curThread.moveToArchive();
           threadsDeleted ++;
           Utilities.sleep(sleepTime);
