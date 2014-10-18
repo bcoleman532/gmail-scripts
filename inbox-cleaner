@@ -52,7 +52,7 @@ function archiveOldEmailsRange(start, max) {
     curThread = threads[i];
     lastDate = curThread.getLastMessageDate();
     months = elapsedMonths(today, lastDate);
-    if(!(curThread.hasStarredMessages())) {
+    if(!(curThread.hasStarredMessages().valueOf())) {
       if(curThread.isImportant().valueOf()) {
         if(curThread.isUnread().valueOf() && months > 6) {
           curThread.moveToArchive();
