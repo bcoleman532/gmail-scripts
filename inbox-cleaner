@@ -1,0 +1,130 @@
+/**
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *   This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * Loops through inbox archiving "old" emails
+ * "old" is defined in the function archiveOldEmailsRange
+ * that this function invokes
+ *
+ * TODO: this function has issues with execution time when trying
+ * to process many emails.  This is due to the limitations with Google's
+ * script service.  To circumvent manually change the starting point.
+ */
+function archiveOldEmails() {
+  start = 0;
+  max = 500;
+  deleted = 0;
+  while (deleted != -1) {
+    deleted = archiveOldEmailsRange(start, max);
+    start += max - deleted;
+  }
+};
+
+/**
+ * Archives up to <max> "old" emails from a starting index <start>
+ * "old" is defined as
+ * -not starred
+ * -labeled as important, older than 6 months, unread
+ * -labeled as important, older than 3 months, read
+ * -not labeled as important, older than 1 month, unread
+ * -not labeled as important, older than 1 week, read
+ */
+function archiveOldEmailsRange(start, max) {
+  var threads = GmailApp.getInboxThreads(start, max);
+  if (threads.length == 0) {
+    return -1;
+  }
+  var threadsDeleted = 0;
+  sleepTime = 200;
+  today = new Date();
+  for (var i = 0; i < threads.length; i++) {
+    curThread = threads[i];
+    months = elapsedMonths(today, curThread.getLastMessageDate());
+    if(!(curThread.hasStarredMessages())) {
+      if(curThread.isImportant().valueOf()) {
+        if(curThread.isUnread().valueOf() && months > 6) {
+          curThread.moveToArchive();
+          threadsDeleted ++;
+          Utilities.sleep(sleepTime);
+        }
+        else if (!(curThread.isUnread().valueOf()) && months > 3) {
+          curThread.moveToArchive();
+          threadsDeleted ++;
+          Utilities.sleep(sleepTime);
+        }
+      }
+      else {
+        if(curThread.isUnread().valueOf() && months > 0.5) {
+          curThread.moveToArchive();
+          threadsDeleted ++;
+          Utilities.sleep(sleepTime);
+        }
+        else if (!(curThread.isUnread().valueOf()) && months*daysInMonth(curThread.getLastMessageDate()) > 7) {
+          curThread.moveToArchive();
+          threadsDeleted ++;
+          Utilities.sleep(sleepTime);
+        }
+      }
+    }
+  }
+  return threadsDeleted;
+};
+
+/**
+ * Gets the number of months elapsed between two Date objects
+ */
+function elapsedMonths(dateTo, dateFrom) {
+  monthLen = daysInMonth(dateFrom);
+  months = 0;
+  months += (dateTo.getFullYear()-dateFrom.getFullYear())*12;
+  months += dateTo.getMonth()-dateFrom.getMonth();
+  months += (dateTo.getDate()-dateFrom.getDate())/daysInMonth(dateFrom);
+  months += (dateTo.getHours()-dateFrom.getHours())/(24*daysInMonth(dateFrom));
+  months += (dateTo.getMinutes()-dateFrom.getMinutes())/(24*60*daysInMonth(dateFrom));
+  months += (dateTo.getSeconds()-dateFrom.getSeconds())/(24*60*60*daysInMonth(dateFrom));
+  return months;
+};
+
+/**
+ * Returns the number of days in a given month
+ */
+function daysInMonth(someDate) {
+  month = someDate.getMonth();
+  switch (month) {
+    case 0:
+    case 2:
+    case 4:
+    case 6:
+    case 7:
+    case 9:
+    case 11:
+      return 31;
+      break;
+    case 3:
+    case 5:
+    case 8:
+    case 10:
+      return 30;
+      break;
+    case 1:
+      year = someDate.getFullYear();
+      if ( year % 4 == 0 && (year % 100 != 0 || year % 100 == 0 && year % 400 == 0))
+        return 29;
+      else
+        return 28;
+      break;
+    default:
+      return "error";
+  }
+};
