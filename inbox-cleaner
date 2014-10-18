@@ -50,7 +50,8 @@ function archiveOldEmailsRange(start, max) {
   today = new Date();
   for (var i = 0; i < threads.length; i++) {
     curThread = threads[i];
-    months = elapsedMonths(today, curThread.getLastMessageDate());
+    lastDate = curThread.getLastMessageDate();
+    months = elapsedMonths(today, lastDate);
     if(!(curThread.hasStarredMessages())) {
       if(curThread.isImportant().valueOf()) {
         if(curThread.isUnread().valueOf() && months > 6) {
@@ -70,7 +71,7 @@ function archiveOldEmailsRange(start, max) {
           threadsDeleted ++;
           Utilities.sleep(sleepTime);
         }
-        else if (!(curThread.isUnread().valueOf()) && months*daysInMonth(curThread.getLastMessageDate()) > 7) {
+        else if (!(curThread.isUnread().valueOf()) && months*daysInMonth(lastDate) > 7) {
           curThread.moveToArchive();
           threadsDeleted ++;
           Utilities.sleep(sleepTime);
@@ -89,10 +90,10 @@ function elapsedMonths(dateTo, dateFrom) {
   months = 0;
   months += (dateTo.getFullYear()-dateFrom.getFullYear())*12;
   months += dateTo.getMonth()-dateFrom.getMonth();
-  months += (dateTo.getDate()-dateFrom.getDate())/daysInMonth(dateFrom);
-  months += (dateTo.getHours()-dateFrom.getHours())/(24*daysInMonth(dateFrom));
-  months += (dateTo.getMinutes()-dateFrom.getMinutes())/(24*60*daysInMonth(dateFrom));
-  months += (dateTo.getSeconds()-dateFrom.getSeconds())/(24*60*60*daysInMonth(dateFrom));
+  months += (dateTo.getDate()-dateFrom.getDate())/monthLen;
+  months += (dateTo.getHours()-dateFrom.getHours())/(24*monthLen;
+  months += (dateTo.getMinutes()-dateFrom.getMinutes())/(1440*monthLen);
+  months += (dateTo.getSeconds()-dateFrom.getSeconds())/(86400*monthLen);
   return months;
 };
 
