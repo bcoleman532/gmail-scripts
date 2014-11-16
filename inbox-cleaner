@@ -22,9 +22,9 @@
  * script service.  To circumvent manually change the starting point.
  */
 function archiveOldEmails() {
-  start = 0;
-  max = 500;
-  deleted = 0;
+  var start = 0;
+  var max = 500;
+  var deleted = 0;
   while (deleted != -1) {
     deleted = archiveOldEmailsRange(start, max);
     start += max - deleted;
@@ -46,12 +46,12 @@ function archiveOldEmailsRange(start, max) {
     return -1;
   }
   var threadsDeleted = 0;
-  sleepTime = 1000;
-  today = new Date();
+  var sleepTime = 1000;
+  var today = new Date();
   for (var i = 0; i < threads.length; i++) {
-    curThread = threads[i];
-    lastDate = curThread.getLastMessageDate();
-    months = elapsedMonths(today, lastDate);
+    var curThread = threads[i];
+    var lastDate = curThread.getLastMessageDate();
+    var months = elapsedMonths(today, lastDate);
     if(!(curThread.hasStarredMessages().valueOf())) {
       if(curThread.isImportant().valueOf()) {
         if(curThread.isUnread().valueOf() && months > 6) {
@@ -86,12 +86,12 @@ function archiveOldEmailsRange(start, max) {
  * Gets the number of months elapsed between two Date objects
  */
 function elapsedMonths(dateTo, dateFrom) {
-  monthLen = daysInMonth(dateFrom);
-  months = 0;
+  var monthLen = daysInMonth(dateFrom);
+  var months = 0;
   months += (dateTo.getFullYear()-dateFrom.getFullYear())*12;
   months += dateTo.getMonth()-dateFrom.getMonth();
   months += (dateTo.getDate()-dateFrom.getDate())/monthLen;
-  months += (dateTo.getHours()-dateFrom.getHours())/(24*monthLen;
+  months += (dateTo.getHours()-dateFrom.getHours())/(24*monthLen);
   months += (dateTo.getMinutes()-dateFrom.getMinutes())/(1440*monthLen);
   months += (dateTo.getSeconds()-dateFrom.getSeconds())/(86400*monthLen);
   return months;
@@ -101,7 +101,7 @@ function elapsedMonths(dateTo, dateFrom) {
  * Returns the number of days in a given month
  */
 function daysInMonth(someDate) {
-  month = someDate.getMonth();
+  var month = someDate.getMonth();
   switch (month) {
     case 0:
     case 2:
@@ -119,8 +119,8 @@ function daysInMonth(someDate) {
       return 30;
       break;
     case 1:
-      year = someDate.getFullYear();
-      if ( year % 4 == 0 && (year % 100 != 0 || year % 100 == 0 && year % 400 == 0))
+      var year = someDate.getFullYear();
+      if ( year % 4 == 0 && (year % 100 != 0 || year % 400 == 0))
         return 29;
       else
         return 28;
